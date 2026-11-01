@@ -4,6 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ГМО №1 МВЛ</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+<!-- Подключаем библиотеку Supabase для синхронизации -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#ffe4ef,#ffd6e8,#ffeef7);min-height:100vh;padding:20px;color:#7a5a66}.wrap{max-width:900px;margin:0 auto}.hide{display:none!important}
@@ -35,7 +36,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;borde
   <button class="btn ghost" onclick="go('home')">← Назад</button>
   <div id="teacherLogin" class="card" style="margin-top:15px;text-align:center">
     <h3>Вход по коду</h3>
-    <input id="tCode" placeholder="Введите ваш код" style="text-align:center;text-transform:uppercase">
+    <p style="font-size:14px;margin-bottom:15px">Введите код, который выдал директор.</p>
+    <input id="tCode" placeholder="Напр. A1B-2C3" style="text-align:center;font-size:18px;text-transform:uppercase;font-weight:bold">
     <button class="btn" onclick="checkAccess()" style="width:100%">Войти</button>
   </div>
   <div id="teacherList" class="hide">
@@ -65,7 +67,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;borde
     <h3>Добавить сотрудника (создать код)</h3>
     <input id="stFio" placeholder="ФИО учителя">
     <input id="stLoad" placeholder="Должность (Учитель ИЗО)">
-    <button class="btn" onclick="addStaff()">➕ Создать код</button>
+    <button class="btn" onclick="addStaff()">➕ Создать код доступа</button>
     <div id="staffList" style="margin-top:15px"></div>
   </div>
   <div class="card"><h3>Создать тест</h3>
@@ -75,36 +77,47 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px;borde
     <button class="btn ghost" onclick="addQ()">+ Вопрос</button>
     <button class="btn" onclick="saveTest()">💾 Сохранить</button>
   </div>
-  <div class="card"><h3>Тесты</h3><div id="admTests"></div></div>
+  <div class="card"><h3>Созданные тесты</h3><div id="admTests"></div></div>
   <div class="card"><h3>Результаты</h3><button class="btn ghost" onclick="loadRes()">🔄 Обновить</button><div id="resList"></div></div>
 </div>
+
 <script>
 const PWD="direktor2024"; 
+// ПОДКЛЮЧЕНИЕ БАЗЫ ДАННЫХ SUPABASE
 const supabase = window.supabase.createClient("https://ixrwwpkwqmtquxjsksan.supabase.co", "sb_publishable_IaZzughtAZNtfZqkKNW9uQ_Gq3fOAhJ");
 const $=id=>document.getElementById(id);
+
+// Асинхронные функции для получения данных из облака
 async function getT(){ const {data}=await supabase.from('tests').select('*'); return data||[]; }
 async function getR(){ const {data}=await supabase.from('results').select('*'); return data||[]; }
+// Сотрудников (коды) оставим в памяти, так как их создает только директор на своем ПК
 const getS=()=>JSON.parse(localStorage.getItem('gm_staff')||'[]'), setS=a=>localStorage.setItem('gm_staff',JSON.stringify(a));
 
 function go(n){
   document.querySelectorAll('[id^="s-"]').forEach(e=>e.classList.add('hide'));
   $('s-'+n).classList.remove('hide');
-  if(n==='tests'){ const t=JSON.parse(sessionStorage.getItem('teacher')||'null'); $('teacherLogin').classList.toggle('hide',!!t); $('teacherList').classList.toggle('hide',!t); if(t) loadTests(); }
+  if(n==='tests'){
+    const t=JSON.parse(sessionStorage.getItem('teacher')||'null');
+    $('teacherLogin').classList.toggle('hide',!!t);
+    $('teacherList').classList.toggle('hide',!t);
+    if(t) loadTests();
+  }
   if(n==='admin'){ loadAdm(); loadStaff(); loadRes(); }
 }
 window.go=go;
 
 function checkAccess(){
-  const code=$('tCode').value.trim().toUpperCase();
-  const s=getS().find(x=>x.code===code);
-  if(!s) return alert('Код не найден!');
-  sessionStorage.teacher=JSON.stringify(s);
+  const code = $('tCode').value.trim().toUpperCase();
+  const staff = getS().find(x => x.code === code);
+  if(!staff) return alert('Код не найден!');
+  sessionStorage.teacher = JSON.stringify(staff);
   go('tests');
 }
 window.checkAccess=checkAccess;
 
 function logoutTeacher(){ sessionStorage.removeItem('teacher'); go('tests'); }
 window.logoutTeacher=logoutTeacher;
+
 function login(){ if($('pwd').value===PWD){ go('admin'); } else alert('Неверный пароль'); }
 window.login=login;
 
@@ -112,10 +125,10 @@ async function loadTests(){
   const L=$('testsList'), a=await getT(), t=JSON.parse(sessionStorage.getItem('teacher')), r=await getR();
   if(!a.length){ L.innerHTML='<div class="card">Нет тестов</div>'; return; }
   L.innerHTML=a.map(x=>{
-    const passed=r.some(y=>y.test_id==x.id && y.fio.toLowerCase()===t.fio.toLowerCase());
+    const passed = r.some(y => y.test_id==x.id && y.fio.toLowerCase()===t.fio.toLowerCase());
     return `<div class="card" style="display:flex;justify-content:space-between;align-items:center">
       <div><b>${x.title}</b><br><small>До: ${new Date(x.deadline).toLocaleString()}</small></div>
-      ${passed?'<b style="color:green">✓ Сдано</b>':`<button class="btn" onclick="take('${x.id}')">Пройти</button>`}
+      ${passed ? '<b style="color:green">✓ Сдано</b>' : `<button class="btn" onclick="take('${x.id}')">Пройти</button>`}
     </div>`;
   }).join('');
 }
@@ -144,7 +157,10 @@ async function submitT(id){
   const qs = typeof cur.questions === 'string' ? JSON.parse(cur.questions) : cur.questions;
   const ans = qs.map((_,i)=>{ const c=document.querySelector(`input[name="q${i}"]:checked`); return c?+c.value:-1; });
   let score=0; qs.forEach((q,i)=>{ if(ans[i]===q.correct) score++; });
+  
+  // Отправляем результат в облако Supabase
   await supabase.from('results').insert([{ test_id: String(cur.id), test_title: cur.title, fio: t.fio, load: t.load, answers: ans, score: score, total: qs.length, submitted_at: new Date().toISOString() }]);
+  
   $('testContent').innerHTML=`<div class="card" style="text-align:center"><h2>Отправлено!</h2><h1>${score} / ${qs.length}</h1><button class="btn" onclick="go('tests')">К тестам</button></div>`;
 }
 window.submitT=submitT;
@@ -155,13 +171,13 @@ function addStaff(){
   const a=getS();
   const code=Math.random().toString(36).substring(2,5).toUpperCase()+'-'+Math.random().toString(36).substring(2,5).toUpperCase();
   a.push({fio,load,code}); setS(a);
-  alert('Код: '+code); $('stFio').value=''; $('stLoad').value=''; loadStaff();
+  alert('Сотрудник добавлен!\nКод: '+code); $('stFio').value=''; $('stLoad').value=''; loadStaff();
 }
 window.addStaff=addStaff;
 
 function loadStaff(){
-  const a=getS();
-  $('staffList').innerHTML=a.map((s,i)=>`<div class="item"><div><b>${s.fio}</b><br>${s.load}</div><div><span class="code">${s.code}</span> <button class="btn danger sm" onclick="setS(getS().filter((x,j)=>j!==${i}));loadStaff()">X</button></div></div>`).join('');
+  const L=$('staffList'), a=getS();
+  L.innerHTML=a.map((s,i)=>`<div class="item"><div><b>${s.fio}</b><br>${s.load}</div><div><span class="code">${s.code}</span> <button class="btn danger sm" onclick="setS(getS().filter((x,j)=>j!==${i}));loadStaff()">X</button></div></div>`).join('');
 }
 
 function addQ(){
@@ -188,8 +204,11 @@ async function saveTest(){
     if(text && opts.length>1 && cor>-1) qs.push({text,options:opts,correct:cor});
   });
   if(!qs.length) return alert('Нужен 1 вопрос');
+  
+  // Сохраняем тест в облако
   const {error} = await supabase.from('tests').insert([{ title, deadline:dl, questions: JSON.stringify(qs), grades: JSON.stringify({g5,g4,g3}) }]);
   if(error) return alert('Ошибка базы: '+error.message);
+  
   alert('Создан!'); $('nTitle').value=''; $('nQs').innerHTML=''; addQ(); loadAdm();
 }
 window.saveTest=saveTest;
