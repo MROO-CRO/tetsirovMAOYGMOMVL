@@ -1,113 +1,128 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ГМО №1 МВЛ</title>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#ffe4ef,#ffd6e8,#ffeef7);min-height:100vh;padding:20px;color:#7a5a66}.wrap{max-width:1000px;margin:0 auto}.hide{display:none!important}
-.hero{background:#fff;border-radius:28px;padding:40px 20px;max-width:600px;margin:40px auto;text-align:center;border:2px solid #ffd1e3;box-shadow:0 20px 60px rgba(255,150,190,.35)}
-h1,h2,h3{color:#d6336c}h1.title{font-size:28px;margin-bottom:20px}
-.btn{display:inline-block;background:linear-gradient(135deg,#ff8fab,#ff5c8a);color:#fff;padding:12px 24px;border-radius:999px;border:none;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:0 8px 20px rgba(255,92,138,.4);transition:.2s}.btn.ghost{background:transparent;color:#d6336c;border:2px solid #ffd1e3;box-shadow:none}.btn.sm{padding:6px 12px;font-size:13px}.btn.danger{background:linear-gradient(135deg,#ff5c8a,#e63973)}.btn:disabled{opacity:.5;cursor:not-allowed}
-.card{background:#fff;border:2px solid #ffd1e3;border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 6px 20px rgba(255,150,190,.15)}
-input{width:100%;padding:10px 14px;border-radius:12px;border:2px solid #ffd1e3;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px}input:focus{border-color:#ff8fab}
-.lbl{color:#a06a7c;font-size:13px;font-weight:600;display:block;margin-bottom:4px}
-.item{background:#fff;border:2px solid #ffd1e3;border-radius:20px;padding:18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.item h3{margin-bottom:4px}.dl{color:#a06a7c;font-size:13px}.dl b{color:#d6336c}
-.q{color:#d6336c;font-weight:600;margin-bottom:10px;font-size:15px}.opt{display:block;padding:10px 14px;border-radius:10px;border:2px solid #ffe4ef;margin-bottom:6px;cursor:pointer}.opt:hover{border-color:#ffb6ce;background:#fff7fa}.opt.sel{border-color:#ff8fab;background:#fff0f6}.opt input{width:auto;margin-right:10px;accent-color:#ff5c8a}
-.result{background:#fff;border-radius:20px;padding:30px;text-align:center;border:2px solid #ffd1e3}.result .score{font-size:40px;color:#ff5c8a;font-weight:700;margin:10px 0}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #ffe4ef;text-align:left}th{color:#d6336c}
-.stats{display:flex;gap:10px;margin-bottom:16px}.stat{background:#fff7fa;border-radius:12px;padding:10px 16px;color:#d6336c;font-weight:700;font-size:18px}.stat span{display:block;font-size:11px;color:#a06a7c;font-weight:400}
-.login{max-width:400px;margin:80px auto;text-align:center}
-.mback{position:fixed;inset:0;background:rgba(120,60,90,.4);display:flex;align-items:center;justify-content:center;padding:15px;z-index:100}.modal{background:#fff;border-radius:20px;padding:20px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;border:2px solid #ffd1e3}
-.right{background:#e6fff0;border-left:4px solid #3cbc6e;padding:8px 12px;border-radius:6px;margin-bottom:4px}.wrong{background:#ffe6ec;border-left:4px solid #ff5c8a;padding:8px 12px;border-radius:6px;margin-bottom:4px}.neutral{padding:8px 12px;color:#7a5a66}.ok{color:#3cbc6e;font-weight:600}.bad{color:#ff5c8a;font-weight:600}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}.topbar .back{color:#d6336c;text-decoration:none;font-weight:600;background:none;border:none;cursor:pointer;font-size:15px}
-.tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}.tab{background:#fff;border:2px solid #ffd1e3;padding:8px 16px;border-radius:999px;cursor:pointer;font-weight:600;color:#d6336c;font-size:14px}.tab.active{background:linear-gradient(135deg,#ff8fab,#ff5c8a);color:#fff;border-color:transparent}
-.timer{position:fixed;top:16px;right:16px;background:#fff;padding:8px 16px;border-radius:999px;border:2px solid #ffd1e3;color:#d6336c;font-weight:600;box-shadow:0 4px 12px rgba(255,150,190,.3)}
-.grade{display:inline-block;padding:3px 10px;border-radius:6px;color:#fff;font-weight:700}.g5{background:#3cbc6e}.g4{background:#4a90e2}.g3{background:#f5a623}.g2{background:#ff5c8a}
-.code-txt{font-family:monospace;font-size:15px;font-weight:bold;background:#ffe4ef;padding:4px 8px;border-radius:4px;letter-spacing:1px}
-@keyframes slideUpFade{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}[id^="s-"],.card,.item{animation:slideUpFade .4s ease-out forwards}body::before{content:"🌸";position:fixed;top:-50px;left:-50px;font-size:150px;opacity:.15;z-index:-1;animation:float 6s infinite}body::after{content:"🌸";position:fixed;bottom:-50px;right:-50px;font-size:200px;opacity:.1;z-index:-1;animation:float 8s infinite reverse}@keyframes float{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(20px,30px) rotate(15deg)}100%{transform:translate(0,0) rotate(0)}}.btn{transition:all .3s cubic-bezier(.25,.8,.25,1)!important}.btn:hover{transform:translateY(-3px) scale(1.02)!important;box-shadow:0 12px 30px rgba(255,92,138,.6)!important;letter-spacing:.5px}.btn:active{transform:translateY(1px) scale(.98)!important}.opt{animation:slideUpFade .3s forwards;opacity:0}.opt:nth-child(1){animation-delay:.05s}.opt:nth-child(2){animation-delay:.1s}.opt:nth-child(3){animation-delay:.15s}.opt:nth-child(4){animation-delay:.2s}@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}.timer{animation:pulse 2s infinite}.tab{transition:all .3s ease}.tab:hover:not(.active){transform:translateY(-2px);background:#ffe4ef}@keyframes modalPop{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}.modal{animation:modalPop .3s cubic-bezier(.175,.885,.32,1.275) forwards!important}@keyframes scorePop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}.result .score{animation:scorePop .6s ease-out forwards;display:inline-block}
-</style>
-</head>
-<body>
-<div id="s-home" class="hero">
-  <h1>🌸 ГМО №1 МВЛ</h1>
-  <p style="margin:15px 0;font-size:15px">Это официальный сайт для внутренних тестирований <strong>только для сотрудников МАОУ «ГМО №1 МВЛ»</strong>.<br>Здесь вы можете проверить знания школьной системы.</p>
-  <button class="btn" onclick="go('tests')" style="margin-top:10px">Перейти к тестированиям →</button>
-  <div style="margin-top:20px;font-size:13px;color:#b58a99">© МАОУ «ГМО №1 МВЛ»<br><a href="#" onclick="go('login');return false" style="color:#d6336c;margin-top:6px;display:inline-block">Вход для директора</a></div>
-</div>
-<div id="s-tests" class="wrap hide">
-  <div class="topbar"><button class="back" onclick="go('home')">← На главную</button><div style="font-size:14px;color:#d6336c;font-weight:600" id="whoami"></div></div>
-  <div id="codeBlock" class="card" style="text-align:center;max-width:400px;margin:40px auto">
-    <h2 style="margin-bottom:10px">Вход в тестирования</h2><p style="font-size:14px;margin-bottom:15px">Введите персональный код.</p>
-    <input id="accessCode" placeholder="Напр. A1B-2C3" style="text-align:center;font-size:18px;text-transform:uppercase;font-weight:bold">
-    <button class="btn" onclick="checkAccess()" style="width:100%">Войти →</button>
-  </div>
-  <div id="testsBlock" class="hide">
-    <div style="text-align:right;margin-bottom:10px"><button class="btn ghost sm" onclick="logoutTeacher()">Сменить код</button></div>
-    <h1 class="title">📚 Доступные тестирования</h1><div id="testsList"></div>
-  </div>
-</div>
-<div id="s-test" class="wrap hide">
-  <div class="topbar"><button class="back" onclick="go('tests')">← К списку</button></div>
-  <h1 class="title" id="tTitle">Загрузка…</h1><div class="dl" id="tDl" style="margin-bottom:16px"></div><div id="tContent"></div>
-</div>
-<div id="s-login" class="hide">
-  <div class="login"><h1>👑 Вход директора</h1><div class="card"><input type="password" id="pwd" placeholder="Пароль" onkeydown="if(event.key==='Enter')login()"><button class="btn" onclick="login()" style="width:100%">Войти</button></div><button class="btn ghost sm" onclick="go('home')">← На главную</button></div>
-</div>
-<div id="s-admin" class="wrap hide">
-  <div class="topbar"><h1 class="title" style="margin:0">👑 Панель директора</h1><button class="btn ghost sm" onclick="logoutAdmin()">Выйти</button></div>
-  <div class="tabs"><div class="tab active" id="tab-tests" onclick="switchTab('tests')">📝 Тесты</div><div class="tab" id="tab-staff" onclick="switchTab('staff')">👥 Сотрудники</div><div class="tab" id="tab-res" onclick="switchTab('res')">📊 Результаты</div></div>
-  <div id="view-tests">
-    <div class="card">
-      <h2 style="margin-bottom:10px;font-size:18px">Создать тест</h2>
-      <input id="nTitle" placeholder="Название теста"><input id="nDl" type="datetime-local">
-      <div style="display:flex;gap:10px;margin-bottom:10px"><div style="flex:1"><label class="lbl">Оценка 5 (%)</label><input type="number" id="g5" value="90"></div><div style="flex:1"><label class="lbl">Оценка 4 (%)</label><input type="number" id="g4" value="75"></div><div style="flex:1"><label class="lbl">Оценка 3 (%)</label><input type="number" id="g3" value="50"></div></div>
-      <div id="nQs"></div>
-      <div style="margin-top:10px;display:flex;gap:10px"><button class="btn ghost" onclick="addQ()">+ Вопрос</button><button class="btn" onclick="saveTest()">💾 Сохранить</button></div>
-    </div>
-    <div id="admTests" class="card"></div>
-  </div>
-  <div id="view-staff" class="hide">
-    <div class="card"><h2 style="margin-bottom:10px;font-size:18px">Добавить сотрудника</h2><input id="stFio" placeholder="ФИО учителя"><input id="stLoad" placeholder="Учитель ИЗО"><button class="btn" onclick="addStaff()">➕ Добавить и создать код</button></div>
-    <div id="staffList" class="card"></div>
-  </div>
-  <div id="view-res" class="hide">
-    <div class="card"><div style="margin-bottom:10px;display:flex;gap:10px"><button class="btn" onclick="exportXl()">📊 В Excel</button><button class="btn ghost" onclick="loadRes()">🔄 Обновить</button></div><div id="resList"></div></div>
-  </div>
-</div>
-<div id="mBack" class="mback hide" onclick="if(event.target===this)closeM()"><div class="modal" id="mContent"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const PWD="direktor2024", $=id=>document.getElementById(id), esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const getT=()=>JSON.parse(localStorage.getItem('gm_tests')||'[]'), setT=a=>localStorage.setItem('gm_tests',JSON.stringify(a));
-const getR=()=>JSON.parse(localStorage.getItem('gm_results')||'[]'), setR=a=>localStorage.setItem('gm_results',JSON.stringify(a));
+const PWD="direktor2024"; 
+// ВАШИ КЛЮЧИ SUPABASE:
+const supabase = window.supabase.createClient("https://ixrwwpkwqmtquxjsksan.supabase.co", "sb_publishable_IaZzughtAZNtfZqkKNW9uQ_Gq3fOAhJ");
+
+const $=id=>document.getElementById(id), esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Получение данных из облака
+async function getT(){ const {data}=await supabase.from('tests').select('*'); return data||[]; }
+async function getR(){ const {data}=await supabase.from('results').select('*'); return data||[]; }
+// Сотрудников (коды) оставим в памяти браузера директора
 const getS=()=>JSON.parse(localStorage.getItem('gm_staff')||'[]'), setS=a=>localStorage.setItem('gm_staff',JSON.stringify(a));
+
 function go(n){document.querySelectorAll('[id^="s-"]').forEach(e=>e.classList.add('hide'));$('s-'+n)?.classList.remove('hide');scrollTo(0,0);if(n==='tests'){const t=JSON.parse(sessionStorage.getItem('teacher')||'null');$('codeBlock').classList.toggle('hide',!!t);$('testsBlock').classList.toggle('hide',!t);if(t)loadTests();else $('whoami').textContent='';}if(n==='admin'){switchTab('tests');loadAdm();loadStaff();loadRes()}} window.go=go;
 function switchTab(n){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));$('tab-'+n).classList.add('active');['tests','staff','res'].forEach(x=>$('view-'+x).classList.toggle('hide',x!==n))} window.switchTab=switchTab;
+
 function checkAccess(){const code=$('accessCode').value.trim().toUpperCase();if(!code)return;const s=getS().find(x=>x.code===code);if(!s)return alert('Код не найден!');sessionStorage.teacher=JSON.stringify({fio:s.fio,load:s.load});$('accessCode').value='';$('whoami').textContent=`👤 ${s.fio} (${s.load})`;$('codeBlock').classList.add('hide');$('testsBlock').classList.remove('hide');loadTests()} window.checkAccess=checkAccess;
 function logoutTeacher(){sessionStorage.removeItem('teacher');$('whoami').textContent='';$('codeBlock').classList.remove('hide');$('testsBlock').classList.add('hide')} window.logoutTeacher=logoutTeacher;
 function login(){if($('pwd').value===PWD){sessionStorage.isAdm='1';$('pwd').value='';go('admin')}else alert('Неверный пароль')} window.login=login;
 function logoutAdmin(){sessionStorage.removeItem('isAdm');go('home')} window.logoutAdmin=logoutAdmin;
-function loadTests(){const L=$('testsList'),a=getT(),t=JSON.parse(sessionStorage.getItem('teacher')||'null');if(!t)return;if(!a.length){L.innerHTML='<div class="card" style="text-align:center;color:#a06a7c">Нет тестов</div>';return}L.innerHTML=a.map(x=>{const dl=x.deadline?new Date(x.deadline).toLocaleString('ru-RU'):'—',passed=getR().some(r=>r.testId==x.id&&r.fio.trim().toLowerCase()===t.fio.trim().toLowerCase());return`<div class="item"><div><h3>${esc(x.title)}</h3><div class="dl">До: <b>${dl}</b></div></div>${passed?'<span style="color:#3cbc6e;font-weight:700">✓ Сдано</span>':`<button class="btn" onclick="take('${x.id}')">Пройти →</button>`}</div>`}).join('')} window.loadTests=loadTests;
-function take(id){history.pushState({},'','?id='+id);go('test');loadTake(id)} window.take=take;
+
+async function loadTests(){
+  const L=$('testsList'), a=await getT(), t=JSON.parse(sessionStorage.getItem('teacher')||'null');
+  if(!t)return; if(!a.length){L.innerHTML='<div class="card" style="text-align:center;color:#a06a7c">Нет тестов</div>';return}
+  const res = await getR();
+  L.innerHTML=a.map(x=>{
+    const dl=x.deadline?new Date(x.deadline).toLocaleString('ru-RU'):'—';
+    const passed=res.some(r=>r.test_id==x.id&&r.fio.trim().toLowerCase()===t.fio.trim().toLowerCase());
+    return`<div class="item"><div><h3>${esc(x.title)}</h3><div class="dl">До: <b>${dl}</b></div></div>${passed?'<span style="color:#3cbc6e;font-weight:700">✓ Сдано</span>':`<button class="btn" onclick="take('${x.id}')">Пройти →</button>`}</div>`
+  }).join('')
+} window.loadTests=loadTests;
+
 let cur=null,t0=null,tmr=null;
-function loadTake(id){const t=JSON.parse(sessionStorage.getItem('teacher')||'null');if(!t)return go('tests');cur=getT().find(x=>x.id==id);if(!cur){$('tContent').innerHTML='<div class="card">Не найден</div>';return}$('tTitle').textContent=cur.title;$('tDl').innerHTML=cur.deadline?`До: <b>${new Date(cur.deadline).toLocaleString('ru-RU')}</b>`:'';let h=`<div class="card" style="background:#fff7fa"><label class="lbl">ФИО</label><input value="${esc(t.fio)}" disabled style="font-weight:bold;background:#fff"><label class="lbl">Нагрузка</label><input value="${esc(t.load)}" disabled style="font-weight:bold;background:#fff"></div>`;cur.questions.forEach((q,i)=>{h+=`<div class="card"><div class="q">${i+1}. ${esc(q.text)}</div>${q.options.map((o,j)=>`<label class="opt" onclick="sel(this)"><input type="radio" name="q${i}" value="${j}"> ${esc(o)}</label>`).join('')}</div>`});h+=`<button class="btn" style="width:100%" onclick="submitT()">Отправить</button>`;$('tContent').innerHTML=h;startTimer()} window.loadTake=loadTake;
+async function take(id){
+  const a=await getT(); cur=a.find(x=>x.id==id); 
+  if(!cur)return alert('Тест не найден');
+  history.pushState({},'','?id='+id);go('test');
+  const t=JSON.parse(sessionStorage.getItem('teacher')||'null');
+  $('tTitle').textContent=cur.title;$('tDl').innerHTML=cur.deadline?`До: <b>${new Date(cur.deadline).toLocaleString('ru-RU')}</b>`:'';
+  let h=`<div class="card" style="background:#fff7fa"><label class="lbl">ФИО</label><input value="${esc(t.fio)}" disabled style="font-weight:bold;background:#fff"><label class="lbl">Нагрузка</label><input value="${esc(t.load)}" disabled style="font-weight:bold;background:#fff"></div>`;
+  const qs = typeof cur.questions === 'string' ? JSON.parse(cur.questions) : cur.questions;
+  qs.forEach((q,i)=>{h+=`<div class="card"><div class="q">${i+1}. ${esc(q.text)}</div>${q.options.map((o,j)=>`<label class="opt" onclick="sel(this)"><input type="radio" name="q${i}" value="${j}"> ${esc(o)}</label>`).join('')}</div>`});
+  h+=`<button class="btn" style="width:100%" onclick="submitT()">Отправить</button>`;
+  $('tContent').innerHTML=h;startTimer();
+} window.take=take;
+
 function sel(l){const n=l.querySelector('input').name;document.querySelectorAll(`input[name="${n}"]`).forEach(i=>i.closest('.opt').classList.remove('sel'));l.classList.add('sel')} window.sel=sel;
 function startTimer(){if(tmr)clearInterval(tmr);t0=Date.now();$('tmr')?.remove();const d=document.createElement('div');d.className='timer';d.id='tmr';d.textContent='⏱ 0:00';document.body.appendChild(d);tmr=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);d.textContent=`⏱ ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`},1000)}
-function submitT(){const t=JSON.parse(sessionStorage.getItem('teacher')||'null');if(!t)return;const rA=getR();if(rA.some(r=>r.testId==cur.id&&r.fio.trim().toLowerCase()===t.fio.trim().toLowerCase()))return alert('Вы уже сдавали!');const ans=cur.questions.map((_,i)=>{const c=document.querySelector(`input[name="q${i}"]:checked`);return c?+c.value:-1}),dur=t0?Math.round((Date.now()-t0)/1000):0;let score=0;cur.questions.forEach((q,i)=>{if(ans[i]===q.correct)score++});const total=cur.questions.length;rA.push({id:Date.now().toString(),testId:cur.id,testTitle:cur.title,fio:t.fio,load:t.load,answers:ans,score,total,durationSec:dur,submittedAt:Date.now()});setR(rA);clearInterval(tmr);$('tmr')?.remove();const pct=Math.round((score/total)*100);$('tContent').innerHTML=`<div class="result"><h2>Завершено!</h2><div class="score">${score} / ${total}</div><p>Процент: <b>${pct}%</b><br>Время: ${Math.floor(dur/60)}м ${dur%60}с</p><button class="btn" style="margin-top:20px" onclick="go('tests')">← К тестам</button></div>`} window.submitT=submitT;
+
+async function submitT(){
+  const t=JSON.parse(sessionStorage.getItem('teacher')||'null');
+  const rA=await getR();
+  if(rA.some(r=>r.test_id==cur.id&&r.fio.trim().toLowerCase()===t.fio.trim().toLowerCase()))return alert('Вы уже сдавали!');
+  const qs = typeof cur.questions === 'string' ? JSON.parse(cur.questions) : cur.questions;
+  const ans=qs.map((_,i)=>{const c=document.querySelector(`input[name="q${i}"]:checked`);return c?+c.value:-1}),dur=t0?Math.round((Date.now()-t0)/1000):0;
+  let score=0;qs.forEach((q,i)=>{if(ans[i]===q.correct)score++});
+  const total=qs.length;
+  
+  await supabase.from('results').insert([{test_id:String(cur.id),test_title:cur.title,fio:t.fio,load:t.load,answers:ans,score,total,duration_sec:dur,submitted_at:new Date().toISOString()}]);
+  
+  clearInterval(tmr);$('tmr')?.remove();
+  const pct=Math.round((score/total)*100);
+  $('tContent').innerHTML=`<div class="result"><h2>Завершено!</h2><div class="score">${score} / ${total}</div><p>Процент: <b>${pct}%</b><br>Время: ${Math.floor(dur/60)}м ${dur%60}с</p><button class="btn" style="margin-top:20px" onclick="go('tests')">← К тестам</button></div>`
+} window.submitT=submitT;
+
 function addStaff(){const fio=$('stFio').value.trim(),load=$('stLoad').value.trim();if(!fio||!load)return alert('Заполните поля!');const a=getS();if(a.some(s=>s.fio.trim().toLowerCase()===fio.toLowerCase()))return alert('Уже есть!');const gen=()=>Math.random().toString(36).substring(2,5).toUpperCase()+'-'+Math.random().toString(36).substring(2,5).toUpperCase();let code=gen();while(a.some(s=>s.code===code))code=gen();a.push({id:Date.now().toString(),fio,load,code});setS(a);alert(`Сотрудник добавлен!\nКод: ${code}`);$('stFio').value='';$('stLoad').value='';loadStaff()} window.addStaff=addStaff;
 function loadStaff(){const L=$('staffList'),a=getS();if(!a.length){L.innerHTML='<p style="color:#a06a7c">Список пуст</p>';return}L.innerHTML=a.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #ffe4ef;flex-wrap:wrap;gap:10px"><div><b>${esc(s.fio)}</b><br><small>${esc(s.load)}</small></div><div style="display:flex;align-items:center;gap:10px"><span class="code-txt">${s.code}</span><button class="btn danger sm" onclick="delStaff('${s.id}')">Удалить</button></div></div>`).join('')} window.loadStaff=loadStaff;
 function delStaff(id){if(!confirm('Удалить?'))return;setS(getS().filter(s=>s.id!=id));loadStaff()} window.delStaff=delStaff;
+
 function addQ(){const d=document.createElement('div');d.className='qb';d.style.cssText='background:#fff7fa;padding:12px;border-radius:12px;margin-bottom:10px';d.innerHTML=`<input placeholder="Вопрос" class="qtext" style="font-weight:600"><div class="opts"></div><div style="display:flex;gap:8px;margin-top:6px"><button type="button" class="btn ghost sm" onclick="addO(this)">+ вариант</button><button type="button" class="btn danger sm" onclick="this.closest('.qb').remove()" style="margin-left:auto">Удалить</button></div>`;$('nQs').appendChild(d);addO(d.querySelector('.btn.ghost'))} window.addQ=addQ;
 function addO(b){const o=b.parentElement.parentElement.querySelector('.opts'),r=document.createElement('div');r.className='orow';r.style.cssText='display:flex;gap:8px;margin-bottom:6px';r.innerHTML=`<input type="radio" name="c${Math.random()}" style="width:auto"><input type="text" placeholder="Вариант ${o.children.length+1}" style="margin:0;flex:1">`;o.appendChild(r)} window.addO=addO;
-function saveTest(){const title=$('nTitle').value.trim(),dl=$('nDl').value,g5=+$('g5').value,g4=+$('g4').value,g3=+$('g3').value;if(!title||!dl)return alert('Заполните название и дату');const qs=[];document.querySelectorAll('#nQs .qb').forEach(b=>{const text=b.querySelector('.qtext').value.trim(),ors=[...b.querySelectorAll('.orow')],opts=ors.map(r=>r.querySelector('input[type=text]').value.trim());let cor=-1;ors.forEach((r,i)=>{if(r.querySelector('input[type=radio]').checked)cor=i});if(text&&opts.length>=2&&cor>=0)qs.push({text,options:opts,correct:cor})});if(!qs.length)return alert('Добавьте 1 вопрос с ответом!');const a=getT();a.push({id:Date.now().toString(),title,deadline:dl,questions:qs,grades:{g5,g4,g3}});setT(a);alert('Создан!');$('nTitle').value='';$('nDl').value='';$('nQs').innerHTML='';addQ();loadAdm()} window.saveTest=saveTest;
-function loadAdm(){const L=$('admTests'),a=getT();if(!a.length){L.innerHTML='<p style="color:#a06a7c">Нет тестов</p>';return}L.innerHTML='<h2 style="margin-bottom:10px;font-size:18px">Созданные тесты</h2>'+a.map(t=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #ffe4ef;flex-wrap:wrap;gap:10px"><div><b>${esc(t.title)}</b><br><small>до ${new Date(t.deadline).toLocaleString('ru-RU')}</small></div><button class="btn danger sm" onclick="delT('${t.id}')">Удалить</button></div>`).join('')} window.loadAdm=loadAdm;
-function delT(id){if(!confirm('Удалить?'))return;setT(getT().filter(t=>t.id!=id));loadAdm()} window.delT=delT;
-let cache=[];const fmtD=s=>!s?'—':`${Math.floor(s/60)}м ${s%60}с`;
+
+async function saveTest(){
+  const title=$('nTitle').value.trim(),dl=$('nDl').value,g5=+$('g5').value,g4=+$('g4').value,g3=+$('g3').value;
+  if(!title||!dl)return alert('Заполните название и дату');
+  const qs=[];
+  document.querySelectorAll('#nQs .qb').forEach(b=>{const text=b.querySelector('.qtext').value.trim(),ors=[...b.querySelectorAll('.orow')],opts=ors.map(r=>r.querySelector('input[type=text]').value.trim());let cor=-1;ors.forEach((r,i)=>{if(r.querySelector('input[type=radio]').checked)cor=i});if(text&&opts.length>=2&&cor>=0)qs.push({text,options:opts,correct:cor})});
+  if(!qs.length)return alert('Добавьте 1 вопрос с ответом!');
+  
+  const { error } = await supabase.from('tests').insert([{title, deadline: dl, questions: qs, grades: {g5,g4,g3}}]);
+  if(error){ alert('Ошибка базы: '+error.message); return; }
+  alert('Создан!');$('nTitle').value='';$('nDl').value='';$('nQs').innerHTML='';addQ();loadAdm();
+} window.saveTest=saveTest;
+
+async function loadAdm(){const L=$('admTests'),a=await getT();if(!a.length){L.innerHTML='<p style="color:#a06a7c">Нет тестов</p>';return}L.innerHTML='<h2 style="margin-bottom:10px;font-size:18px">Созданные тесты</h2>'+a.map(t=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #ffe4ef;flex-wrap:wrap;gap:10px"><div><b>${esc(t.title)}</b><br><small>до ${new Date(t.deadline).toLocaleString('ru-RU')}</small></div><button class="btn danger sm" onclick="delT('${t.id}')">Удалить</button></div>`).join('')} window.loadAdm=loadAdm;
+async function delT(id){if(!confirm('Удалить?'))return;await supabase.from('tests').delete().eq('id',id);loadAdm()} window.delT=delT;
+
+let cache=[];
 function getGrade(score,total,g){if(!g)return{n:'-',cls:''};const p=total?(score/total)*100:0;if(p>=g.g5)return{n:'5',cls:'g5'};if(p>=g.g4)return{n:'4',cls:'g4'};if(p>=g.g3)return{n:'3',cls:'g3'};return{n:'2',cls:'g2'}}
-function loadRes(){const B=$('resList'),a=getR(),tests=getT();a.sort((x,y)=>y.submittedAt-x.submittedAt);cache=a;if(!a.length){B.innerHTML='<p style="color:#a06a7c">Нет результатов</p>';return}const avg=Math.round(a.reduce((s,r)=>s+(r.total?r.score/r.total:0),0)/a.length*100);B.innerHTML=`<div class="stats"><div class="stat">${a.length}<span>сдач</span></div><div class="stat">${avg}%<span>средний</span></div></div><div style="overflow-x:auto"><table><tr><th>Дата</th><th>Тест</th><th>ФИО</th><th>Баллы</th><th>Оценка</th><th></th></tr>${a.map(r=>{const test=tests.find(x=>x.id==r.testId),g=test?getGrade(r.score,r.total,test.grades):{n:'-',cls:''};return`<tr><td>${new Date(r.submittedAt).toLocaleString('ru-RU')}</td><td>${esc(r.testTitle)}</td><td>${esc(r.fio)}<br><small>${esc(r.load)}</small></td><td><b>${r.score}/${r.total}</b></td><td><span class="grade ${g.cls}">${g.n}</span></td><td><button class="btn sm" onclick="showD('${r.id}')">Разбор</button></td></tr>`}).join('')}</table></div>`} window.loadRes=loadRes;
-function showD(id){const r=cache.find(x=>x.id===id),t=getT().find(x=>x.id==r.testId);if(!t)return alert('Тест удалён');const g=getGrade(r.score,r.total,t.grades),pct=Math.round((r.score/r.total)*100);let html=`<h2>${esc(r.fio)}</h2><p style="margin-bottom:10px">Тест: <b>${esc(t.title)}</b><br>Баллы: <b>${r.score}/${r.total}</b> (${pct}%)<br>Оценка: <span class="grade ${g.cls}">${g.n}</span></p><hr style="margin:10px 0;border:none;border-top:2px solid #ffe4ef">`;t.questions.forEach((q,i)=>{const ch=r.answers[i],ok=ch===q.correct;html+=`<div style="margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">${i+1}. ${esc(q.text)} ${ok?'<span class="ok">✓</span>':'<span class="bad">✗</span>'}</div>`;q.options.forEach((o,j)=>{const ic=j===q.correct,isel=j===ch;let cls='neutral';if(ic)cls='right';else if(isel)cls='wrong';html+=`<div class="${cls}">${esc(o)}${ic?' <span class="ok">← ответ</span>':''}${isel&&!ic?' <span class="bad">← выбран</span>':''}</div>`});html+='</div>'});html+=`<div style="text-align:right"><button class="btn" onclick="closeM()">Закрыть</button></div>`;$('mContent').innerHTML=html;$('mBack').classList.remove('hide')} window.showD=showD;
+
+async function loadRes(){
+  const B=$('resList'),a=await getR(),tests=await getT();
+  a.sort((x,y)=>new Date(y.submitted_at)-new Date(x.submitted_at));cache=a;
+  if(!a.length){B.innerHTML='<p style="color:#a06a7c">Нет результатов</p>';return}
+  const avg=Math.round(a.reduce((s,r)=>s+(r.total?r.score/r.total:0),0)/a.length*100);
+  B.innerHTML=`<div class="stats"><div class="stat">${a.length}<span>сдач</span></div><div class="stat">${avg}%<span>средний</span></div></div><div style="overflow-x:auto"><table><tr><th>Дата</th><th>Тест</th><th>ФИО</th><th>Баллы</th><th>Оценка</th><th></th></tr>${a.map(r=>{const test=tests.find(x=>x.id==r.test_id);let g={n:'-',cls:''};if(test){const gr=typeof test.grades==='string'?JSON.parse(test.grades):test.grades;g=getGrade(r.score,r.total,gr)}return`<tr><td>${new Date(r.submitted_at).toLocaleString('ru-RU')}</td><td>${esc(r.test_title)}</td><td>${esc(r.fio)}<br><small>${esc(r.load)}</small></td><td><b>${r.score}/${r.total}</b></td><td><span class="grade ${g.cls}">${g.n}</span></td><td><button class="btn sm" onclick="showD('${r.id}')">Разбор</button></td></tr>`}).join('')}</table></div>`
+} window.loadRes=loadRes;
+
+async function showD(id){
+  const r=cache.find(x=>x.id==id);if(!r)return;
+  const t=(await getT()).find(x=>x.id==r.test_id);if(!t)return alert('Тест удалён');
+  const gr=typeof t.grades==='string'?JSON.parse(t.grades):t.grades;
+  const g=getGrade(r.score,r.total,gr),pct=Math.round((r.score/r.total)*100);
+  const qs=typeof t.questions==='string'?JSON.parse(t.questions):t.questions;
+  const ans=typeof r.answers==='string'?JSON.parse(r.answers):r.answers;
+  let html=`<h2>${esc(r.fio)}</h2><p style="margin-bottom:10px">Тест: <b>${esc(t.title)}</b><br>Баллы: <b>${r.score}/${r.total}</b> (${pct}%)<br>Оценка: <span class="grade ${g.cls}">${g.n}</span></p><hr style="margin:10px 0;border:none;border-top:2px solid #ffe4ef">`;
+  qs.forEach((q,i)=>{const ch=ans[i],ok=ch===q.correct;html+=`<div style="margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">${i+1}. ${esc(q.text)} ${ok?'<span class="ok">✓</span>':'<span class="bad">✗</span>'}</div>`;q.options.forEach((o,j)=>{const ic=j===q.correct,isel=j===ch;let cls='neutral';if(ic)cls='right';else if(isel)cls='wrong';html+=`<div class="${cls}">${esc(o)}${ic?' <span class="ok">← ответ</span>':''}${isel&&!ic?' <span class="bad">← выбран</span>':''}</div>`});html+='</div>'});
+  html+=`<div style="text-align:right"><button class="btn" onclick="closeM()">Закрыть</button></div>`;
+  $('mContent').innerHTML=html;$('mBack').classList.remove('hide')
+} window.showD=showD;
 function closeM(){$('mBack').classList.add('hide')} window.closeM=closeM;
-function exportXl(){if(!cache.length)return alert('Нет данных');const tests=getT();const data=cache.map(r=>{const t=tests.find(x=>x.id==r.testId),g=t?getGrade(r.score,r.total,t.grades):{n:'-'};return{'Тест':r.testTitle,'ФИО':r.fio,'Нагрузка':r.load,'Баллы':`${r.score}/${r.total}`,'Оценка':g.n,'Время':fmtD(r.durationSec),'Дата':new Date(r.submittedAt).toLocaleString('ru-RU')}});const wb=XLSX.utils.book_new(),ws=XLSX.utils.json_to_sheet(data);XLSX.utils.book_append_sheet(wb,ws,'Результаты');XLSX.writeFile(wb,`results_${new Date().toISOString().slice(0,10)}.xlsx`)} window.exportXl=exportXl;
+
+async function exportXl(){
+  if(!cache.length)return alert('Нет данных');
+  const tests=await getT();
+  const data=cache.map(r=>{
+    const t=tests.find(x=>x.id==r.test_id);
+    let g='-';
+    if(t){const gr=typeof t.grades==='string'?JSON.parse(t.grades):t.grades;g=getGrade(r.score,r.total,gr).n}
+    return{'Тест':r.test_title,'ФИО':r.fio,'Нагрузка':r.load,'Баллы':`${r.score}/${r.total}`,'Оценка':g,'Время':`${Math.floor(r.duration_sec/60)}м ${r.duration_sec%60}с`,'Дата':new Date(r.submitted_at).toLocaleString('ru-RU')}
+  });
+  const wb=XLSX.utils.book_new(),ws=XLSX.utils.json_to_sheet(data);XLSX.utils.book_append_sheet(wb,ws,'Результаты');XLSX.writeFile(wb,`results_${new Date().toISOString().slice(0,10)}.xlsx`)
+} window.exportXl=exportXl;
+
 addQ();
 </script>
 </body>
